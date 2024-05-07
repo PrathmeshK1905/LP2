@@ -1,0 +1,496 @@
+LA1
+
+from collections import defaultdict
+class Graph:
+    def __init__(self):
+        self.graph = defaultdict(list)
+​
+    def add_edge(self, u, v):
+        self.graph[u].append(v)
+​
+    def bfs(self, start):
+        visited = set()
+        queue = [start]
+​
+        while queue:
+            vertex = queue.pop(0)
+            if vertex not in visited:
+                print(vertex, end=' ')
+                visited.add(vertex)
+                queue.extend(self.graph[vertex])
+​
+    def dfs_util(self, vertex, visited):
+        visited.add(vertex)
+        print(vertex, end=' ')
+​
+        for neighbor in self.graph[vertex]:
+            if neighbor not in visited:
+                self.dfs_util(neighbor, visited)
+​
+    def dfs(self, start):
+        visited = set()
+        self.dfs_util(start, visited)
+​
+# Create graph from user input
+g = Graph()
+print("Enter edges (vertex1 vertex2), type 'done' when finished:")
+while True:
+    edge = input().strip()
+    if edge.lower() == 'done':
+        break
+    u, v = edge.split()
+    g.add_edge(u, v)
+​
+# Take input for starting vertex
+start_vertex = input("Enter starting vertex for BFS and DFS: ").strip()
+​
+# Perform BFS and DFS
+print("\nBFS starting from vertex", start_vertex, ":")
+g.bfs(start_vertex)
+print("\nDFS starting from vertex", start_vertex, ":")
+g.dfs(start_vertex)
+​
+​
+Enter number of edges: 2
+Enter source destination: A B
+Enter source destination: B C
+Enter start node: A
+Depth First Search: 
+
+A B C 
+Breadth First Search: 
+
+A B C 
+#LA1
+from collections import defaultdict, deque
+def dfs(graph,start):
+    visited = set()
+    stack = [start]
+    while stack:
+        vertex = stack.pop()
+        if vertex not in visited:
+            print(vertex, end=' ')
+            visited.add(vertex)
+            stack.extend(graph[vertex] - visited)
+            
+def bfs(graph,start):
+    visited = set()
+    queue = deque([start])
+    while queue:
+        vertex = queue.popleft()
+        if vertex not in visited:
+            print(vertex,end=' ')
+            visited.add(vertex)
+            queue.extend(graph[vertex] - visited)
+​
+def create_graph():
+    graph = defaultdict(set)
+    total = int(input("Enter number of edges: "))
+    for _ in range(total):
+        u,v = input("Enter source destination: ").split()
+        graph[u].add(v)
+        graph[v].add(u)
+    return graph
+​
+​
+graph1 = create_graph()
+start_node = input("Enter start node: ")
+print("Depth First Search: \n")
+DFS = dfs(graph1,start_node)
+print("\nBreadth First Search: \n")
+BFS = bfs(graph1,start_node)
+    
+​
+LA2
+#LA2 A_star
+import heapq
+​
+class PuzzleState:
+    def __init__(self, puzzle, parent=None, move=None):
+        self.puzzle = puzzle
+        self.parent = parent
+        self.move = move
+        self.g = parent.g + 1 if parent else 0
+        self.h = self.calculate_heuristic()
+        self.f = self.g + self.h
+​
+    def __lt__(self, other):
+        return self.f < other.f
+​
+    def is_goal(self):
+        return self.h == 0
+​
+    def calculate_heuristic(self):
+        misplaced = 0
+        goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]  # Define the goal state
+        for i in range(3):
+            for j in range(3):
+                if self.puzzle[i][j] != 0 and self.puzzle[i][j] != goal_state[i][j]:
+                    misplaced += 1
+        return misplaced
+    def get_children(self):
+        children = []
+        empty_pos = next((i, j) for i in range(3) for j in range(3) if self.puzzle[i][j] == 0)
+        moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        for move in moves:
+            new_pos = (empty_pos[0] + move[0], empty_pos[1] + move[1])
+            if 0 <= new_pos[0] < 3 and 0 <= new_pos[1] < 3:
+                new_puzzle = [row[:] for row in self.puzzle]
+                new_puzzle[empty_pos[0]][empty_pos[1]], new_puzzle[new_pos[0]][new_pos[1]] = new_puzzle[new_pos[0]][new_pos[1]], new_puzzle[empty_pos[0]][empty_pos[1]]
+                children.append(PuzzleState(new_puzzle, self, move))
+        return children
+​
+def astar(initial_state, final_state):
+    open_list = []
+    closed_list = set()
+    heapq.heappush(open_list, initial_state)
+​
+    while open_list:
+        current_state = heapq.heappop(open_list)
+​
+        if current_state.is_goal():
+            path = []
+            while current_state:
+                path.append(current_state)
+                current_state = current_state.parent
+            return path[::-1]
+​
+        closed_list.add(tuple(map(tuple, current_state.puzzle)))
+​
+        for child in current_state.get_children():
+            if tuple(map(tuple, child.puzzle)) not in closed_list:
+                child.f = child.g + child.h
+                heapq.heappush(open_list, child)
+​
+    return None
+​
+def get_puzzle_from_user(prompt):
+    print(prompt)
+    return [list(map(int, input(f"Enter row {i + 1} (separated by space): ").split())) for i in range(3)]
+​
+if __name__ == "__main__":
+    initial_puzzle = get_puzzle_from_user("Enter the initial state of the puzzle:")
+    final_puzzle = get_puzzle_from_user("Enter the final state of the puzzle:")
+    
+    initial_state = PuzzleState(initial_puzzle)
+    final_state = PuzzleState(final_puzzle)
+​
+    solution = astar(initial_state, final_state)
+    if solution:
+        print("Solution found:")
+        for step, state in enumerate(solution):
+            print(f"Step {step + 1}:")
+            for row in state.puzzle:
+                print(row)
+            print(f"Heuristic value (h): {state.h }")
+            print()
+    else:
+        print("No solution found.")
+​
+LA3
+#LA3
+#LA3
+def SelectionSort(array,size):
+    for idx in range(size):
+        min_idx = idx
+        for j in range(idx+1,size):
+            if array[j] < array[min_idx]:
+                min_idx = j
+        (array[idx],array[min_idx]) = (array[min_idx],array[idx])
+        
+arr = [12,35,-16,2,0,89,-66]
+size = len(arr)
+result = SelectionSort(arr,size)
+print(arr)
+[-66, -16, 0, 2, 12, 35, 89]
+def jobscheduling(jobs):
+    jobs.sort(key=lambda x:x[2],reverse=True)
+    max_deadline = max(jobs,key= lambda x:[1])[1]
+    result = [-1] * (max_deadline + 1)
+    totalProfit = 0
+    for job in jobs:
+        for j in range(job[1] , 0, -1):
+            if result[j] == -1:
+                result[j] = job[0]
+                totalProfit += job[2]
+                break
+    return result[1:],totalProfit
+​
+def take_input():
+    jobs = []
+    n = int(input("Enter total jobs: "))
+    for _ in range(n):
+        name = input("Enter job name: ")
+        deadline = int(input("Enter deadline: ").format(name))
+        profit = int(input("Enter profit: ").format(name))
+        jobs.append((name,deadline,profit))
+    return jobs
+​
+jobs = take_input()
+schedule,profit = jobscheduling(jobs)
+print("Schedule",schedule)
+print("Profit",profit)
+Enter total jobs: 2
+Enter job name: a
+Enter deadline: 2
+Enter profit: 100
+Enter job name: b
+Enter deadline: 1
+Enter profit: 19
+Schedule ['b', 'a']
+Profit 119
+#For Prims and mst
+#For Prims and mst
+import heapq
+​
+def greedy_prim(graph):
+    mst = []
+    visited = set()
+    start_node = input("Enter start node: ")
+    priority_queue = [(0,start_node,None)]
+    
+    while priority_queue:
+        weight,current_node,parent = heapq.heappop(priority_queue)
+        if current_node not in visited:
+            visited.add(current_node)
+            mst.append((parent,current_node,weight))
+            for neighbor,edge_weight in graph[current_node].items():
+                if neighbor not in visited:
+                    heapq.heappush(priority_queue,(edge_weight,neighbor,current_node))
+                    
+    return mst
+def create_graph():
+    graph = {}
+    num_edges = int(input("Enter the number of edges: "))
+    for _ in range(num_edges):
+        start, end, weight = input("Enter edge (start end weight): ").split()
+        weight = int(weight)
+        if start not in graph:
+            graph[start] = {}
+        if end not in graph:
+            graph[end] = {}
+        graph[start][end] = weight
+        graph[end][start] = weight
+    return graph
+​
+example_graph = create_graph()
+result = greedy_prim(example_graph)
+print("Minimum Spanning Tree:")
+for edge in result:
+    print(edge)
+​
+Enter the number of edges: 2
+Enter edge (start end weight): A B 7
+Enter edge (start end weight): B C 18
+Enter start node: B
+Minimum Spanning Tree:
+(None, 'B', 0)
+('B', 'A', 7)
+('B', 'C', 18)
+def kruskal(graph):
+    def find_parents(parents,node):
+        if parents[node] == node:
+            return node
+        return find_parents(parents,parents[node])
+    
+    def union(parents,rank,node1,node2):
+        root1 = find_parents(parents,node1)
+        root2 = find_parents(parents,node2)
+        if rank[root1] > rank[root2]:
+            parents[root2] = root1
+        elif rank[root1] < rank[root2]:
+            parents[root1] = root2
+        else:
+            parents[root1] = root2
+            rank[root2] += 1
+            
+            
+    mst = []
+    edges = []
+    for node,neighbors in graph.items():
+        for neighbor,weight in neighbors.items():
+            edges.append((weight,node,neighbor))
+    edges.sort()
+    parents = {node:node for node in graph}
+    rank = {node:0 for node in graph}
+    
+    
+    for edge in edges:
+        weight,node1,node2 = edge
+        root1 = find_parents(parents,node1)
+        root2 = find_parents(parents,node2)
+        if root1 != root2:
+            mst.append((node1,node2,weight))
+            union(parents,rank,node1,node2)
+    return mst
+​
+def take_input():
+    graph = {}
+    n = int(input("Enter no of edges: "))
+    for _ in range(n):
+        start,end,weight = input("Enter Node1 Node2 Weight: ").split()
+        weight = int(weight)
+        if start not in graph:
+            graph[start] = {}
+        if end not in graph:
+            graph[end] = {}
+        graph[start][end] = weight
+        graph[end][start] = weight
+    return graph
+​
+g = take_input()
+result = kruskal(g)
+for edge in result:
+    print(edge)
+Enter no of edges: 2
+Enter Node1 Node2 Weight: A B 5
+Enter Node1 Node2 Weight: B C 2
+('B', 'C', 2)
+('A', 'B', 5)
+#Dijiksta
+#Dijiksta
+import sys
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = [[0 for _ in range(vertices)] for _ in range(vertices)]
+    def min_distance(self, dist, visited):
+        min_dist = sys.maxsize
+        min_index = -1
+        for v in range(self.V):
+            if dist[v] < min_dist and not visited[v]:
+                min_dist = dist[v]
+                min_index = v
+        return min_index
+    def dijkstra_mst(self):
+        parent = [None] * self.V  # Array to store constructed MST
+        dist = [sys.maxsize] * self.V  # Key values used to pick minimum weight edge in cut
+        dist[0] = 0  # Make the source vertex key as 0 so that it is picked first
+        visited = [False] * self.V  # To keep track of vertices included in MST
+​
+        parent[0] = -1  # First node is always the root of
+​
+        for _ in range(self.V):
+            u = self.min_distance(dist, visited)
+            visited[u] = True
+            for v in range(self.V):
+                if self.graph[u][v] > 0 and not visited[v] and dist[v] > dist[u] + self.graph[u][v]:
+                    dist[v] = dist[u] + self.graph[u][v]
+                    parent[v] = u
+​
+        self.print_mst(parent)
+​
+    def print_mst(self, parent):
+        print("Edge \tWeight")
+        for i in range(1, self.V):
+            print(parent[i], "-", i, "\t", self.graph[i][parent[i]])
+​
+V = int(input("Enter the number of vertices: "))
+g = Graph(V)
+print("Enter the adjacency matrix for the graph:")
+for i in range(V):
+    g.graph[i] = list(map(int, input().split()))
+​
+g.dijkstra_mst()
+​
+​
+LA4
+#LA4
+class Graphcoloring:
+    def __init__(self,vertices,graph):
+        self.graph = graph
+        self.vertices = vertices
+        self.mincolors = float('inf')
+        self.colors = [-1] * vertices
+        
+    def solve(self):
+        self.trycoloring(0,1)
+        
+    def trycoloring(self,vertex,numcolors):
+        if numcolors >= self.mincolors:
+            return
+        if vertex == self.vertices:
+            self.mincolors = numcolors
+            self.print_solution(numcolors)
+            return
+        for color in range(1,numcolors+1):
+            if self.is_safe(vertex,color):
+                self.colors[vertex] = color
+                self.trycoloring(vertex+1,numcolors)
+                self.colors[vertex] = -1      
+        self.colors[vertex] = numcolors +1
+        self.trycoloring(vertex+1,numcolors+1)
+        self.colors[vertex] = -1
+                
+            
+    def is_safe(self,vertex,color):
+        for i in range(self.vertices):
+            if self.graph[vertex][i] == 1 and self.colors[i] == color:
+                return False
+        return True
+    
+    def print_solution(self,numcolors):
+        print("Solution found in",numcolors,"colors!")
+        for i in range(self.vertices):
+            print("Vertex: ",i,"Color: ",self.colors[i])
+            
+def main():
+    graph= []
+    vertices = int(input("Enter no of total vertices"))
+    for _ in range(vertices):
+        row = list(map(int,input().split()))
+        graph.append(row)
+        
+    coloring = Graphcoloring(vertices,graph)
+    coloring.solve()
+​
+    
+if  __name__ == '__main__':
+    main()
+Enter no of total vertices4
+1 1 1 0
+1 0 1 0
+1 1 0 1
+1 0 1 0
+Solution found in 3 colors!
+Vertex:  0 Color:  1
+Vertex:  1 Color:  2
+Vertex:  2 Color:  3
+Vertex:  3 Color:  2
+LA5
+#LA5
+import re 
+import random
+​
+responses = {
+    r"hi|hello|hey":["Hi","Hey","Hello"],
+    r"who are you":["I am your assistant chatbot"],
+    r"default":["Sorry I dont understand"]
+}
+​
+​
+​
+def respond(user_input):
+    for pattern,response_list in responses.items():
+        if re.search(pattern,user_input,re.IGNORECASE):
+            return random.choice(response_list)
+    return responses['default'][0]
+    
+def main():
+    
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() == 'bye':
+            print("Chatbot: Goodbye")
+            break
+        response = respond(user_input)
+        print("Chatbot: ",response)
+        
+if __name__ == '__main__':
+    main()
+You: hey
+Chatbot:  Hello
+You: who are you
+Chatbot:  I am your assistant chatbot
+You: bye
+Chatbot: Goodbye
